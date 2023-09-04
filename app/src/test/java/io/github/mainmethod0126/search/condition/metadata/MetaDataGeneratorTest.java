@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import io.github.mainmethod0126.search.condition.metadata.domain.TestOrder;
+import io.github.mainmethod0126.search.condition.metadata.util.MetaDataGenerator;
 
 public class MetaDataGeneratorTest {
 

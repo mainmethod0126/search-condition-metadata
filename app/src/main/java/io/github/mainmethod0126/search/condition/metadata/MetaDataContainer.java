@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import io.github.mainmethod0126.annotation.scanner.AnnotationScanner;
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
+import io.github.mainmethod0126.search.condition.metadata.util.MetaDataGenerator;
 
 public class MetaDataContainer implements ConcurrentMap<String, String> {
 
