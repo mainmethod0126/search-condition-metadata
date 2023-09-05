@@ -1,20 +1,328 @@
-# Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+# Introduction
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+This project is a JAVA library that assists the server in creating and providing additional information related to search criteria when clients use the search API, making it easier for clients to create search conditions.
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+# Usage
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Generate MetaData
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+This is a functionality that generates JSON-format MetaData for domain objects using the `@MetaData` and `@MetaDataField` annotations.
+
+### Example
+
+Here is an example of metadata generation for the 'TestOrder' domain class.
+
+#### Default
+
+```java
+public class MetaDataGeneratorTest {
+
+    @Test
+    @DisplayName("Generates metadata from a valid domain class")
+    public void testGenerator_whenNormalParam_thenSuccess() {
+
+        String result = MetaDataGenerator.generate(TestOrder.class);
+
+        System.out.println("metadata : " + result);
+
+        assertThat(result).isNotNull().isNotEmpty();
+
+    }
+
+}
+```
+
+**Result**
+
+```bash
+metadata : [
+  {
+    "name": "description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "customer.user.id",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "customer.user.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "customer.description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "products.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "products.price",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "shippingInfo.productId",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "shippingInfo.quantity",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "shippingInfo.wrapping.style",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  }
+]
+```
+
+#### Specifying a Value Directly Using @MetaDataField
+
+You can use the @MetaDataField annotation when you want to use a separate value other than the one that defaults.
+
+import { Callout } from 'nextra/components'
+ 
+<Callout type="info" emoji="ℹ️">
+  The metadata field annotation is only applied to the last primitive-type field of the domain object. If the annotation is added to a non-primitive type, it will not work and will be ignored.
+</Callout>
+
+**Proper Functioning**
+
+```java
+public class TestUser {
+
+    @MetaDataField(name = "uuid", type = "number", operators = {"=", "!="})
+    private Long id;
+
+    private String name;
+
+}
+```
+
+**Ignored**
+
+```java
+public class TestOrder {
+
+    private String description;
+
+    // @MetaDataField Ignored Cases
+    @MetaDataField(name = "king", type = "string", operators = {"=", "!="})
+    private TestCustomer customer;
+
+    private List<TestProduct> products;
+
+    private Map<String, TestShippingInfo> shippingInfo;
+}
+```
+
+**Result**
+
+```text
+metadata : [
+  {
+    "name": "description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  { "name": "customer.user.uuid", "type": "number", "operators": ["=", "!="] }, <---- The point where the @MetaDataField was applied
+  {
+    "name": "customer.user.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "customer.description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "products.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "products.price",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "shippingInfo.productId",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "shippingInfo.quantity",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "shippingInfo.wrapping.style",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  }
+]
+```
+
+## Store metadata using a container
+
+### Example
+
+You can store the generated MetaData in the MetaDataContainer along with a unique key and retrieve it based on the key when needed.
+
+
+#### Default
+
+```java
+@MetaData
+public class Order {
+
+    @MetaDataField(name = "redefine_description", type = "number", operators = { "=", "!=", ">" })
+    private String description;
+
+    private Product product;
+
+    private Customer customer;
+}
+```
+
+<Callout type="info" emoji="ℹ️">
+  If you do not specify a separate key, the default key is set to the package including the class name.
+</Callout>
+
+<Callout type="info" emoji="ℹ️">
+  The current example was based on a project using the Spring framework, but it can also be used in projects that do not use the Spring framework.
+</Callout>
+
+```java
+@SpringBootApplication
+public class SpringSearchConditionMetadataGeneratorSampleApplication {
+
+	public static void main(String[] args) throws ClassNotFoundException {
+		SpringApplication.run(SpringSearchConditionMetadataGeneratorSampleApplication.class, args);
+
+		MetaDataContainer metaDataContainer = MetaDataContainer.getInstance();
+		metaDataContainer.setBasePackage("io.github.mainmethod0126.springsearchconditionmetadatageneratorsample");
+		metaDataContainer.scan();
+
+        // Since no separate key value was specified for the @MetaData annotation used in the Order class, it attempts to look up by the name of the Order class.
+        System.out.println("metadata : " + metaDataContainer.get(Order.class.getName()));
+	}
+}
+```
+
+##### Result
+
+```text
+metadata :[
+  {
+    "name": "redefine_description",
+    "type": "number",
+    "operators": ["=", "!=", ">"]
+  },
+  {
+    "name": "product.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "product.price",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "customer.user.id",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "customer.user.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "customer.description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  }
+]
+
+```
+
+#### Use `@MetaData` key()
+
+```java
+@MetaData(key = "test_order")
+public class Order {
+
+    @MetaDataField(name = "redefine_description", type = "number", operators = { "=", "!=", ">" })
+    private String description;
+
+    private Product product;
+
+    private Customer customer;
+}
+```
+
+```java
+@SpringBootApplication
+public class SpringSearchConditionMetadataGeneratorSampleApplication {
+
+	public static void main(String[] args) throws ClassNotFoundException {
+		SpringApplication.run(SpringSearchConditionMetadataGeneratorSampleApplication.class, args);
+
+		MetaDataContainer metaDataContainer = MetaDataContainer.getInstance();
+		metaDataContainer.setBasePackage("io.github.mainmethod0126.springsearchconditionmetadatageneratorsample");
+		metaDataContainer.scan();
+
+        // Since a separate key value was specified for the @MetaData annotation used in the Order class, it looks up by that key value.
+        System.out.println("metadata : " + metaDataContainer.get("test_order"));
+	}
+}
+```
+
+##### Result
+
+```text
+metadata :[
+  {
+    "name": "redefine_description",
+    "type": "number",
+    "operators": ["=", "!=", ">"]
+  },
+  {
+    "name": "product.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "product.price",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "customer.user.id",
+    "type": "number",
+    "operators": ["=", "!=", ">=", "<=", ">", "<"]
+  },
+  {
+    "name": "customer.user.name",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  },
+  {
+    "name": "customer.description",
+    "type": "string",
+    "operators": ["=", "!=", "in", "not in", "regex", "wildcard"]
+  }
+]
+
+```
