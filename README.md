@@ -2,6 +2,11 @@
 
 This project is a JAVA library that assists the server in creating and providing additional information related to search criteria when clients use the search API, making it easier for clients to create search conditions.
 
+## Reason for production
+
+I created this to send search metadata information about domains from the server, so that client-side developers can easily generate search filters for the respective domains. This way, it can potentially reduce the workload for client developers.
+
+
 # Usage
 
 ## Generate MetaData
