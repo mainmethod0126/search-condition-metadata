@@ -47,6 +47,7 @@ gradle-app.setting
 # Avoid ignore Gradle wrappper properties
 !gradle-wrapper.properties
 
+
 # Cache of project
 .gradletasknamecache
 
@@ -59,5 +60,8 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+
+
+gradle.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle

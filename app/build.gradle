@@ -18,27 +18,27 @@ buildscript {
 }
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    id 'application'
+    id 'java-library'
     id 'maven-publish'
-    id 'net.linguica.maven-settings' version '0.5'
+    id 'signing'
 }
 
 apply plugin: "io.github.mainmethod0126.simple-semantic-version"
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
 
 
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
-    maven {
-      name = 'Security365Common'
-      url = 'https://pkgs.dev.azure.com/Security365/_packaging/Security365Common/maven/v1/'
-	  } 
 }
 
 dependencies {
 
-    implementation group: 'io.github.mainmethod0126', name: 'annotation-scanner', version: '0.0.4+jdk15'
+    implementation group: 'io.github.mainmethod0126', name: 'annotation-scanner', version: '0.0.4'
     
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.10.1'
@@ -100,6 +100,26 @@ publishing {
       pom {
           name = 'search-condition-metadata'
           description = 'This library provides metadata on what searches are possible for domain objects'
+          url = 'https://github.com/mainmethod0126/search-condition-metadata'
+
+          licenses {
+              license {
+                  name = 'MIT'
+                  url = 'https://github.com/mainmethod0126/search-condition-metadata/blob/main/LICENSE'
+              }
+          }
+          developers {
+              developer {
+                  id = 'mainmethod0126'
+                  name = 'Shin Woosub'
+                  email = 'mainmethod0126@gmail.com'
+              }
+          }
+          scm {
+              connection = 'scm:git:git://github.com/mainmethod0126/search-condition-metadata.git'
+              developerConnection = 'scm:git:ssh://github.com:mainmethod0126/search-condition-metadata.git'
+              url = 'https://github.com/mainmethod0126/search-condition-metadata'
+          }
       }
     }
   }
@@ -116,10 +136,8 @@ publishing {
   }
 }
 
-
-application {
-    // Define the main class for the application.
-    mainClass = 'io.github.mainmethod0126.search.condition.metadata.App'
+signing {
+    sign publishing.publications.mavenJava
 }
 
 tasks.named('test') {
