@@ -1,4 +1,23 @@
-# Introduction
+<!-- TOC -->
+
+- [Generate MetaData](#generate-metadata)
+  - [Reason for production](#reason-for-production)
+  - [Usage](#usage)
+    - [Add dependency](#add-dependency)
+      - [for Gradle](#for-gradle)
+      - [for Maven](#for-maven)
+    - [Example](#example)
+      - [Default](#default)
+      - [Specifying a Value Directly Using @MetaDataField](#specifying-a-value-directly-using-metadatafield)
+      - [Store metadata using a container](#store-metadata-using-a-container)
+        - [Default](#default-1)
+        - [Result](#result)
+      - [Use `@MetaData` key()](#use-metadata-key)
+        - [Result](#result-1)
+
+<!-- /TOC -->
+
+# Generate MetaData
 
 This project is a JAVA library that assists the server in creating and providing additional information related to search criteria when clients use the search API, making it easier for clients to create search conditions.
 
@@ -6,12 +25,41 @@ This project is a JAVA library that assists the server in creating and providing
 
 I created this to send search metadata information about domains from the server, so that client-side developers can easily generate search filters for the respective domains. This way, it can potentially reduce the workload for client developers.
 
+---
 
-# Usage
+## Usage
 
-## Generate MetaData
+### Add dependency
 
-This is a functionality that generates JSON-format MetaData for domain objects using the `@MetaData` and `@MetaDataField` annotations.
+[Go to 🚀 maven central repository](https://central.sonatype.com/artifact/io.github.mainmethod0126/search-condition-metadata)
+
+#### for Gradle
+
+```groovy
+implementation group: 'io.github.mainmethod0126', name: 'search-condition-metadata', version: '0.1.0'
+```
+
+- short
+
+```groovy
+implementation 'io.github.mainmethod0126:search-condition-metadata:0.1.0'
+```
+
+- kotlin
+
+```kotlin
+implementation("io.github.mainmethod0126:search-condition-metadata:0.1.0")
+```
+
+#### for Maven
+
+```xml
+<dependency>
+    <groupId>io.github.mainmethod0126</groupId>
+    <artifactId>search-condition-metadata</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
 
 ### Example
 
@@ -94,7 +142,7 @@ metadata : [
 You can use the @MetaDataField annotation when you want to use a separate value other than the one that defaults.
 
 import { Callout } from 'nextra/components'
- 
+
 <Callout type="info" emoji="ℹ️">
   The metadata field annotation is only applied to the last primitive-type field of the domain object. If the annotation is added to a non-primitive type, it will not work and will be ignored.
 </Callout>
@@ -177,14 +225,11 @@ metadata : [
 ]
 ```
 
-## Store metadata using a container
-
-### Example
+#### Store metadata using a container
 
 You can store the generated MetaData in the MetaDataContainer along with a unique key and retrieve it based on the key when needed.
 
-
-#### Default
+##### Default
 
 ```java
 @MetaData
