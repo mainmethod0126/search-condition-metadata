@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MetaData {
     String key() default "";
+
+    int maxDepth() default 3;
 }

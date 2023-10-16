@@ -42,4 +42,7 @@ public @interface MetaDataField {
 
     String[] operators() default {};
 
+    int maxDepth() default 5;
+
+
 }

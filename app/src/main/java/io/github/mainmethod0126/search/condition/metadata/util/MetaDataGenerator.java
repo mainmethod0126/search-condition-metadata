@@ -5,11 +5,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaDataField;
 
 public class MetaDataGenerator {
@@ -27,16 +29,53 @@ public class MetaDataGenerator {
      */
     public static String generate(Class<?> clazz) {
 
+        Map<String, Integer> scanDepthCounterMap = new HashMap<>();
+
         JsonArray fields = new JsonArray();
 
         for (Field field : clazz.getDeclaredFields()) {
-            toJson(fields, "", field);
+            if (clazz.getAnnotation(MetaData.class) != null) {
+                toJson(clazz, fields, "", field, scanDepthCounterMap);
+            }
         }
 
         return fields.toString();
     }
 
-    private static void toJson(JsonArray fields, String parentName, Field field) {
+    private static void countDepth(Field field, Map<String, Integer> scanDepthCounterMap) {
+
+        String key = field.getType().getName() + field.getName();
+
+        if (scanDepthCounterMap.containsKey(key)) {
+            int depthCount = scanDepthCounterMap.get(key);
+            scanDepthCounterMap.replace(key, ++depthCount);
+        } else {
+            scanDepthCounterMap.put(key, 0);
+        }
+    }
+
+    private static boolean isEnd(Class<?> rootClazz, Field field, Map<String, Integer> scanDepthCounterMap) {
+
+        MetaDataField metaDataFieldAnno = field.getAnnotation(MetaDataField.class);
+        MetaData metaDataAnno = rootClazz.getAnnotation(MetaData.class);
+        String key = field.getType().getName() + field.getName();
+
+        if (metaDataFieldAnno != null) {
+            return metaDataFieldAnno.maxDepth() <= scanDepthCounterMap.get(key);
+        } else {
+            return metaDataAnno.maxDepth() <= scanDepthCounterMap.get(key);
+        }
+    }
+
+    /**
+     * 
+     * @param fields
+     * @param parentName
+     * @param field
+     * @param scanDepthCounterMap
+     */
+    private static void toJson(Class<?> rootClazz, JsonArray fields, String parentName, Field field,
+            Map<String, Integer> scanDepthCounterMap) {
 
         JsonObject jsonObject = new JsonObject();
 
@@ -97,7 +136,7 @@ public class MetaDataGenerator {
             Class<?> elementType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 
             for (Field f : elementType.getDeclaredFields()) {
-                toJson(fields, parentName + field.getName(), f);
+                toJson(rootClazz, fields, parentName + field.getName(), f, scanDepthCounterMap);
             }
 
         } else if (Map.class.isAssignableFrom(type)) {
@@ -108,12 +147,19 @@ public class MetaDataGenerator {
             Class<?> valueType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[1];
 
             for (Field f : valueType.getDeclaredFields()) {
-                toJson(fields, parentName + field.getName(), f);
+                toJson(rootClazz, fields, parentName + field.getName(), f, scanDepthCounterMap);
             }
 
         } else {
+
+            countDepth(field, scanDepthCounterMap);
+
+            if (isEnd(rootClazz, field, scanDepthCounterMap)) {
+                return;
+            }
+
             for (Field f : type.getDeclaredFields()) {
-                toJson(fields, parentName + field.getName(), f);
+                toJson(rootClazz, fields, parentName + field.getName(), f, scanDepthCounterMap);
             }
         }
     }
