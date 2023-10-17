@@ -7,6 +7,7 @@
       - [for Gradle](#for-gradle)
       - [for Maven](#for-maven)
     - [Example](#example)
+      - [@MetaData Annotation](#metadata-annotation)
       - [Default](#default)
       - [Specifying a Value Directly Using @MetaDataField](#specifying-a-value-directly-using-metadatafield)
       - [Store metadata using a container](#store-metadata-using-a-container)
@@ -15,6 +16,7 @@
       - [Use `@MetaData` key()](#use-metadata-key)
         - [Result](#result-1)
 
+<!-- /TOC -->
 <!-- /TOC -->
 
 # Generate MetaData
@@ -64,6 +66,10 @@ implementation("io.github.mainmethod0126:search-condition-metadata:0.1.0")
 ### Example
 
 Here is an example of metadata generation for the 'TestOrder' domain class.
+
+#### @MetaData Annotation
+
+The domain class intending to generate metadata must use the '@MetaData' annotation as a mandatory requirement.
 
 #### Default
 
@@ -141,15 +147,12 @@ metadata : [
 
 You can use the @MetaDataField annotation when you want to use a separate value other than the one that defaults.
 
-import { Callout } from 'nextra/components'
-
-<Callout type="info" emoji="ℹ️">
-  The metadata field annotation is only applied to the last primitive-type field of the domain object. If the annotation is added to a non-primitive type, it will not work and will be ignored.
-</Callout>
+> The metadata field annotation is only applied to the last primitive-type field of the domain object. If the annotation is added to a non-primitive type, it will not work and will be ignored.
 
 **Proper Functioning**
 
 ```java
+@MetaData
 public class TestUser {
 
     @MetaDataField(name = "uuid", type = "number", operators = {"=", "!="})
@@ -163,6 +166,7 @@ public class TestUser {
 **Ignored**
 
 ```java
+@MetaData
 public class TestOrder {
 
     private String description;
