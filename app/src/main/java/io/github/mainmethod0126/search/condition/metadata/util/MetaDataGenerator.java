@@ -16,10 +16,18 @@ import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaDataField;
 import io.github.mainmethod0126.search.condition.metadata.exception.AnnotationNotFoundException;
 
+/**
+ * This utility class, MetaDataGenerator, is responsible for generating
+ * JSON-formatted metadata
+ * for searching based on domain classes. It includes methods for converting
+ * field information to JSON format,
+ * checking recursion depth, and handling custom annotations for metadata
+ * fields.
+ */
 public class MetaDataGenerator {
 
     private MetaDataGenerator() {
-        // util class
+        // utility class
     }
 
     /**
@@ -49,6 +57,12 @@ public class MetaDataGenerator {
         return fields.toString();
     }
 
+    /**
+     * Counts the depth of the field
+     * 
+     * @param field               The field to count the depth of
+     * @param scanDepthCounterMap A map to store the depth counter
+     */
     private static void countDepth(Field field, Map<String, Integer> scanDepthCounterMap) {
 
         String key = field.getType().getName() + field.getName();
@@ -61,6 +75,16 @@ public class MetaDataGenerator {
         }
     }
 
+    /**
+     * It checks whether the recursion counter for the given field has reached its
+     * limit.
+     * 
+     * @param rootClazz           The root class
+     * @param field               The field to check
+     * @param scanDepthCounterMap A map to store the depth counter
+     * @return If the recursion counter has reached, it returns true; otherwise, it
+     *         returns false.
+     */
     private static boolean isEnd(Class<?> rootClazz, Field field, Map<String, Integer> scanDepthCounterMap) {
 
         MetaDataField metaDataFieldAnno = field.getAnnotation(MetaDataField.class);
@@ -75,11 +99,13 @@ public class MetaDataGenerator {
     }
 
     /**
+     * Converts a field to metadata JSON format
      * 
-     * @param fields
-     * @param parentName
-     * @param field
-     * @param scanDepthCounterMap
+     * @param rootClazz           The root class
+     * @param fields              The JsonArray to store the fields
+     * @param parentName          The parent field's name
+     * @param field               The field to convert
+     * @param scanDepthCounterMap A map to store the depth counter
      */
     private static void toJson(Class<?> rootClazz, JsonArray fields, String parentName, Field field,
             Map<String, Integer> scanDepthCounterMap) {
@@ -175,6 +201,13 @@ public class MetaDataGenerator {
         }
     }
 
+    /**
+     * Overwrites custom values in JsonObject based on MetaDataField annotation
+     * 
+     * @param annotation The MetaDataField annotation
+     * @param jsonObject The JsonObject to update
+     * @param parentName The parent field's name
+     */
     private static void overwriteCustomValue(Annotation annotation, JsonObject jsonObject, String parentName) {
 
         MetaDataField metaDataField = (MetaDataField) annotation;
@@ -199,6 +232,12 @@ public class MetaDataGenerator {
 
     }
 
+    /**
+     * Checks if the type is numeric
+     * 
+     * @param type The class type to check
+     * @return True if the type is numeric, otherwise false
+     */
     private static boolean isNumeric(Class<?> type) {
 
         return type == int.class || type == double.class || type == float.class || type == long.class
