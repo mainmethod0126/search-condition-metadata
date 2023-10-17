@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import io.github.mainmethod0126.annotation.scanner.AnnotationScanner;
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
+import io.github.mainmethod0126.search.condition.metadata.exception.AnnotationNotFoundException;
 import io.github.mainmethod0126.search.condition.metadata.util.MetaDataGenerator;
 
 public class MetaDataContainer implements ConcurrentMap<String, String> {
@@ -57,7 +58,11 @@ public class MetaDataContainer implements ConcurrentMap<String, String> {
                                 + key);
             }
 
-            this.metadatas.put(key, MetaDataGenerator.generate(clazz));
+            try {
+                this.metadatas.put(key, MetaDataGenerator.generate(clazz));
+            } catch (AnnotationNotFoundException e) {
+                e.printStackTrace();
+            }
         }
     }
 

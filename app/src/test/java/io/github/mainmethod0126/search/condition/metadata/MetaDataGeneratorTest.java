@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import io.github.mainmethod0126.search.condition.metadata.domain.TestHuman;
 import io.github.mainmethod0126.search.condition.metadata.domain.TestLocalDateTime;
 import io.github.mainmethod0126.search.condition.metadata.domain.TestOrder;
+import io.github.mainmethod0126.search.condition.metadata.exception.AnnotationNotFoundException;
 import io.github.mainmethod0126.search.condition.metadata.util.MetaDataGenerator;
 
-public class MetaDataGeneratorTest {
+class MetaDataGeneratorTest {
 
     @Test
     @DisplayName("Generates metadata from a valid domain class")
-    public void testGenerator_whenNormalParam_thenSuccess() {
+    void testGenerator_whenNormalParam_thenSuccess() throws AnnotationNotFoundException {
 
         String result = MetaDataGenerator.generate(TestOrder.class);
 
@@ -25,7 +26,7 @@ public class MetaDataGeneratorTest {
 
     @Test
     @DisplayName("Generates metadata from a domain class with a recursive structure")
-    public void testGenerator_whenRecursiveParam_thenSuccess() {
+    void testGenerator_whenRecursiveParam_thenSuccess() throws AnnotationNotFoundException {
 
         String result = MetaDataGenerator.generate(TestHuman.class);
 
@@ -37,7 +38,7 @@ public class MetaDataGeneratorTest {
 
     @Test
     @DisplayName("Generates metadata from a domain class that has a member of LocalDateTime type")
-    public void testGenerator_whenLocalDateTimeParam_thenSuccess() {
+    void testGenerator_whenLocalDateTimeParam_thenSuccess() throws AnnotationNotFoundException {
 
         String result = MetaDataGenerator.generate(TestLocalDateTime.class);
 

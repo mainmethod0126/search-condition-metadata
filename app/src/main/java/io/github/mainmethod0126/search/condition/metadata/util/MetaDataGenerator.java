@@ -2,6 +2,7 @@ package io.github.mainmethod0126.search.condition.metadata.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +14,7 @@ import com.google.gson.JsonObject;
 
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
 import io.github.mainmethod0126.search.condition.metadata.annotation.MetaDataField;
+import io.github.mainmethod0126.search.condition.metadata.exception.AnnotationNotFoundException;
 
 public class MetaDataGenerator {
 
@@ -26,15 +28,20 @@ public class MetaDataGenerator {
      * 
      * @param clazz Domain class
      * @return json Type MetaData
+     * @throws AnnotationNotFoundException
      */
-    public static String generate(Class<?> clazz) {
+    public static String generate(Class<?> clazz) throws AnnotationNotFoundException {
 
         Map<String, Integer> scanDepthCounterMap = new HashMap<>();
 
         JsonArray fields = new JsonArray();
 
+        if (clazz.getAnnotation(MetaData.class) == null) {
+            throw new AnnotationNotFoundException("this class does not utilize the mandatory annotation MetaData");
+        }
+
         for (Field field : clazz.getDeclaredFields()) {
-            if (clazz.getAnnotation(MetaData.class) != null) {
+            if (!Modifier.isStatic(field.getModifiers())) {
                 toJson(clazz, fields, "", field, scanDepthCounterMap);
             }
         }
@@ -76,6 +83,10 @@ public class MetaDataGenerator {
      */
     private static void toJson(Class<?> rootClazz, JsonArray fields, String parentName, Field field,
             Map<String, Integer> scanDepthCounterMap) {
+
+        if (Modifier.isStatic(field.getModifiers())) {
+            return;
+        }
 
         JsonObject jsonObject = new JsonObject();
 
