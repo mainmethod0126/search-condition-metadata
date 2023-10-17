@@ -13,6 +13,10 @@ import io.github.mainmethod0126.search.condition.metadata.annotation.MetaData;
 import io.github.mainmethod0126.search.condition.metadata.exception.AnnotationNotFoundException;
 import io.github.mainmethod0126.search.condition.metadata.util.MetaDataGenerator;
 
+/**
+ * This class represents a container for metaData in JSON format. It implements
+ * the {@code ConcurrentMap} interface for thread-safe operations.
+ */
 public class MetaDataContainer implements ConcurrentMap<String, String> {
 
     private String basePackage = "";
@@ -24,14 +28,30 @@ public class MetaDataContainer implements ConcurrentMap<String, String> {
     private MetaDataContainer() {
     }
 
+    /**
+     * Sets the base package for scanning classes with metaData annotations.
+     *
+     * @param basePackage The base package to be set.
+     */
     public void setBasePackage(String basePackage) {
         this.basePackage = basePackage;
     }
 
+    /**
+     * Retrieves the singleton instance of MetaDataContainer.
+     *
+     * @return The singleton instance.
+     */
     public static MetaDataContainer getInstance() {
         return instance;
     }
 
+    /**
+     * Scans classes with metaData annotations and generates metaData JSON for them.
+     *
+     * @throws ClassNotFoundException If a class specified in the base package is
+     *                                not found.
+     */
     public void scan() throws ClassNotFoundException {
 
         if (this.basePackage.isEmpty()) {
